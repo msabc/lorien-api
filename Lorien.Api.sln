@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{830C4E68-FAAF-4C6A-BEF8-FF110491EA75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lorien.Api", "src\Lorien.Api\Lorien.Api.csproj", "{27E0DDFB-E6F4-474B-99CB-DE586DD1E7F2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27E0DDFB-E6F4-474B-99CB-DE586DD1E7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27E0DDFB-E6F4-474B-99CB-DE586DD1E7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27E0DDFB-E6F4-474B-99CB-DE586DD1E7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27E0DDFB-E6F4-474B-99CB-DE586DD1E7F2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{27E0DDFB-E6F4-474B-99CB-DE586DD1E7F2} = {830C4E68-FAAF-4C6A-BEF8-FF110491EA75}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37C1F267-AFF5-4AC6-915F-117CCFA3AECD}
+	EndGlobalSection
+EndGlobal
