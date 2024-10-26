@@ -1,11 +1,30 @@
+using Lorien.Api.Filters;
+using Lorien.IoC;
+
+const string ClientApplicationPermissionPolicyName = nameof(ClientApplicationPermissionPolicyName);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: ClientApplicationPermissionPolicyName,
+    policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+builder.Services.RegisterApplicationDependencies(builder.Configuration);
+
+builder.Services.AddScoped<ApiExceptionFilterAttribute>();
 
 var app = builder.Build();
 
