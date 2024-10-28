@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Lorien.IoC\Lorien.IoC.csproj" />
+    <ProjectReference Include="..\Crosscutting\Lorien.IoC\Lorien.IoC.csproj" />
     <ProjectReference Include="..\Lorien.Application\Lorien.Application.csproj" />
   </ItemGroup>
 

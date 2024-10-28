@@ -1,6 +1,8 @@
 ﻿using Lorien.Application.Services;
 using Lorien.Configuration;
+using Lorien.Domain.Interfaces.Repositories;
 using Lorien.Domain.Interfaces.Services.Flights;
+using Lorien.Infrastructure.Repositories;
 using Lorien.Infrastructure.Services.Flights;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +16,7 @@ namespace Lorien.IoC
         {
             services.RegisterSettings(configuration)
                     .RegisterHttpClients(configuration)
+                    .RegisterRepositories()
                     .RegisterApplicationServices();
 
             return services;
@@ -43,6 +46,14 @@ namespace Lorien.IoC
             {
                 client.BaseAddress = new Uri(settings.AmadeusCRSClient.BaseUrl);
             });
+
+            return services;
+        }
+
+        private static IServiceCollection RegisterRepositories(this IServiceCollection services)
+        {
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<IIATACodeRepository, IATACodeRepository>();
 
             return services;
         }

@@ -13,5 +13,17 @@ namespace Lorien.Api.Controllers
         {
             return Ok(await _flightService.GetFlightPricingAsync(request));
         }
+
+        [HttpGet("currency-codes")]
+        public async Task<IActionResult> GetCurrencyCodes()
+        {
+            return Ok(await _flightService.GetCurrencies());
+        }
+
+        [HttpGet("iata-codes")]
+        public async Task<IActionResult> GetIATACodes()
+        {
+            return Ok(await _flightService.GetIATACodes());
+        }
     }
 }

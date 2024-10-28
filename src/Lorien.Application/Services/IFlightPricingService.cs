@@ -6,5 +6,9 @@ namespace Lorien.Application.Services
     public interface IFlightPricingService
     {
         Task<GetFlightPricingResponse> GetFlightPricingAsync(GetFlightPricingRequest request);
+
+        Task<GetCurrenciesResponse> GetCurrencies();
+
+        Task<GetIATACodesResponse> GetIATACodes();
     }
 }
