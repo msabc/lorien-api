@@ -9,10 +9,5 @@
         public required DateTime DepartureDate { get; set; }
 
         public required byte Adults { get; set; }
-
-        public override string ToString()
-        {
-            return $"{OriginLocationCode}-{DestinationLocationCode}-{DepartureDate:yyyy-MM-dd}-{Adults}";
-        }
     }
 }

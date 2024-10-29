@@ -2,31 +2,35 @@
 using Lorien.Application.Mappers;
 using Lorien.Application.Models.Request;
 using Lorien.Application.Models.Response.Flights;
-using Lorien.Domain.Interfaces.Repositories;
+using Lorien.Configuration;
 using Lorien.Domain.Interfaces.Services.Caching;
 using Lorien.Domain.Interfaces.Services.Flights;
 using Lorien.Domain.Models.Caching;
+using Lorien.Domain.Models.Data;
 using Lorien.Domain.Models.Response.Flights;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace Lorien.Application.Services.Flights
 {
     public class FlightPricingService(
         IAmadeusCRSHttpService amadeusCRSHttpService,
         ICachingService cachingService,
-        ICurrencyRepository currencyRepository,
-        IIATACodeRepository iataCodeRepository,
-        ILogger<FlightPricingService> logger) : IFlightPricingService
+        ILogger<FlightPricingService> logger,
+        IOptions<LorienSettings> options) : IFlightPricingService
     {
+        private readonly LorienSettings settings = options.Value;
+
         public async Task<GetFlightPricingResponse> GetFlightPricingAsync(GetFlightPricingRequest request)
         {
             try
             {
+                string cacheKey = request.ToString();
+
                 var mappedRequest = request.MapToRequest();
 
-                string cacheKey = mappedRequest.ToString();
-
-                var cachedOffers = cachingService.Get<FlightOfferData>(cacheKey);
+                var cachedOffers = cachingService.Get<IEnumerable<FlightOfferData>>(cacheKey);
 
                 if (cachedOffers == null || !cachedOffers.Any())
                 {
@@ -53,8 +57,11 @@ namespace Lorien.Application.Services.Flights
         {
             try
             {
-                var currencies = RetrieveAndAddToCache(nameof(CacheKeys.Currencies), currencyRepository.Get);
-                return Task.FromResult(currencies.MapToResponse());
+                var currencies = cachingService
+                    .Get<CacheObject<Currency>>(nameof(CacheKeys.Currencies))!
+                    .Items;
+
+                return Task.FromResult(currencies!.MapToResponse());
             }
             catch (Exception ex)
             {
@@ -63,35 +70,22 @@ namespace Lorien.Application.Services.Flights
             }
         }
 
-        public Task<GetIATACodesResponse> GetIATACodes()
+        public Task<GetIATACodesResponse> GetIATACodes(GetIATACodesRequest request)
         {
             try
             {
-                var iataCodes = RetrieveAndAddToCache(nameof(CacheKeys.IATACodes), iataCodeRepository.Get);
-                return Task.FromResult(iataCodes.MapToResponse());
+                var codes = cachingService
+                    .Get<CacheObject<IATACode>>(nameof(CacheKeys.IATACodes))!
+                    .Items
+                    .Where(x => x.IATA.StartsWith(request.Input) || x.Name.StartsWith(request.Input))
+                    .Take(settings.MaxIATACodeResponseSize);
+
+                return Task.FromResult(codes!.MapToResponse());
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.Message);
                 throw new CustomHttpException("An unexpected error has occurred: " + ex.Message);
-            }
-        }
-
-        private IEnumerable<T> RetrieveAndAddToCache<T>(string key, Func<IEnumerable<T>> dataRetrievalCallback)
-        {
-            var cachedItems = cachingService.Get<T>(key);
-
-            if (cachedItems != null && cachedItems.Any())
-            {
-                return cachedItems;
-            }
-            else
-            {
-                var items = dataRetrievalCallback();
-
-                cachingService.Add(key, items);
-
-                return items;
             }
         }
     }

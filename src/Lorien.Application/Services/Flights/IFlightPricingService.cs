@@ -9,6 +9,6 @@ namespace Lorien.Application.Services.Flights
 
         Task<GetCurrenciesResponse> GetCurrencies();
 
-        Task<GetIATACodesResponse> GetIATACodes();
+        Task<GetIATACodesResponse> GetIATACodes(GetIATACodesRequest request);
     }
 }

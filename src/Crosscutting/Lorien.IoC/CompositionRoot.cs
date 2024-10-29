@@ -48,6 +48,7 @@ namespace Lorien.IoC
             services.AddHttpClient<IAmadeusCRSHttpService, AmadeusCRSHttpService>(client =>
             {
                 client.BaseAddress = new Uri(settings.AmadeusCRSClient.BaseUrl);
+                client.Timeout = TimeSpan.FromSeconds(settings.AmadeusCRSClient.RequestTimeoutInSeconds);
             });
 
             services.AddScoped<ICachingService, CachingService>();

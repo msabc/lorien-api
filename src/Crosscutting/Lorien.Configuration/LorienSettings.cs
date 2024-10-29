@@ -2,10 +2,12 @@
 
 namespace Lorien.Configuration
 {
-    public class LorienSettings
+    public record LorienSettings
     {
         public required AmadeusCRSClientElement AmadeusCRSClient { get; set; }
 
-        public required int RequestCachingTimeToLiveInMinutes { get; set; }
+        public required int FlightPricingRequestCachingTimeToLiveInMinutes { get; set; }
+
+        public required int MaxIATACodeResponseSize { get; set; }
     }
 }

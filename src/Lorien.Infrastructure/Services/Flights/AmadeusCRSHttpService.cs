@@ -3,7 +3,6 @@ using Lorien.Domain.Interfaces.Services.Flights;
 using Lorien.Domain.Models.Request;
 using Lorien.Domain.Models.Response.Auth;
 using Lorien.Domain.Models.Response.Flights;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Headers;
@@ -12,12 +11,9 @@ using System.Net.Http.Json;
 
 namespace Lorien.Infrastructure.Services.Flights
 {
-    public class AmadeusCRSHttpService : IAmadeusCRSHttpService
+    public class AmadeusCRSHttpService(HttpClient httpClient, IOptions<LorienSettings> settings) : IAmadeusCRSHttpService
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<AmadeusCRSHttpService> _logger;
-        private readonly LorienSettings _settings;
-
+        private readonly LorienSettings _settings = settings.Value;
 
         private const string AUTHORIZATION_PARAMETER_TYPE_NAME = "Bearer";
         private const string AUTHORIZATION_GRANT_TYPE_PARAMETER_NAME = "grant_type";
@@ -35,18 +31,9 @@ namespace Lorien.Infrastructure.Services.Flights
 
         private const string DEPARTURE_DATE_FORMAT = "yyyy-MM-dd";
 
-        public AmadeusCRSHttpService(HttpClient httpClient,
-                                     ILogger<AmadeusCRSHttpService> logger,
-                                     IOptions<LorienSettings> settings)
-        {
-            _httpClient = httpClient;
-            _logger = logger;
-            _settings = settings.Value;
-        }
-
         public async Task<GetFlightOfferResponse> GetFlightOffers(GetFlightOfferRequest request)
         {
-            _httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Clear();
 
             // 1. empty token => represents the inital request
             if (string.IsNullOrEmpty(accessToken))
@@ -58,72 +45,58 @@ namespace Lorien.Infrastructure.Services.Flights
             // 3. valid token
             string flightPath = $"{_settings.AmadeusCRSClient.FlightOffersPath}?{ORIGIN_LOCATION_CODE_PARAMETER_KEY_NAME}={request.OriginLocationCode}&{DESTINATION_LOCATION_CODE_PARAMETER_KEY_NAME}={request.DestinationLocationCode}&{DEPARTURE_DATE_PARAMETER_KEY_NAME}={request.DepartureDate.ToString(DEPARTURE_DATE_FORMAT)}&{ADULTS_PARAMETER_KEY_NAME}={request.Adults}";
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AUTHORIZATION_PARAMETER_TYPE_NAME, accessToken);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AUTHORIZATION_PARAMETER_TYPE_NAME, accessToken);
 
-            var primaryResponse = await _httpClient.GetAsync(flightPath);
+            var primaryResponse = await httpClient.GetAsync(flightPath);
 
             if (primaryResponse.StatusCode == HttpStatusCode.OK)
             {
-                string wow = await primaryResponse.Content.ReadAsStringAsync();
                 return await primaryResponse.Content.ReadFromJsonAsync<GetFlightOfferResponse>();
             }
             else if (primaryResponse.StatusCode == HttpStatusCode.Unauthorized)
             {
+                // 2. invalid token
                 var authResponse = await RequestAccessTokenAsync();
                 accessToken = authResponse.AccessToken;
 
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AUTHORIZATION_PARAMETER_TYPE_NAME, accessToken);
-                var secondaryResponse = await _httpClient.GetAsync(flightPath);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AUTHORIZATION_PARAMETER_TYPE_NAME, accessToken);
+                var secondaryResponse = await httpClient.GetAsync(flightPath);
 
-                if (secondaryResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    throw new Exception("mi scusi");
-                }
+                secondaryResponse.EnsureSuccessStatusCode();
 
                 return await secondaryResponse.Content.ReadFromJsonAsync<GetFlightOfferResponse>();
             }
-            else
-            {
-                throw new Exception("messed up");
-            }
+
+            string response = await primaryResponse.Content.ReadAsStringAsync();
+            throw new Exception($"Unexpected server response received from an external API. External API status code: {primaryResponse.StatusCode}. Response: {response}");
         }
 
         private async Task<AmadeusAuthResponse> RequestAccessTokenAsync()
         {
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Clear();
+            httpClient.DefaultRequestHeaders.Clear();
 
-                var formValues = new Dictionary<string, string>()
+            var formValues = new Dictionary<string, string>()
                 {
                     { AUTHORIZATION_GRANT_TYPE_PARAMETER_NAME, AUTHORIZATION_CLIENT_CREDENTIALS_PARAMETER_NAME },
                     { AUTHORIZATION_CLIENT_ID_PARAMETER_NAME, _settings.AmadeusCRSClient.APIKey },
                     { AUTHORIZATION_CLIENT_SECRET_PARAMETER_NAME, _settings.AmadeusCRSClient.APISecret }
                 };
 
-                var request = new HttpRequestMessage()
-                {
-                    Method = HttpMethod.Post,
-                    Headers = {
+            var request = new HttpRequestMessage()
+            {
+                Method = HttpMethod.Post,
+                Headers = {
                             { HttpRequestHeader.ContentType.ToString(), AUTHORIZATION_CONTENT_TYPE },
                     },
-                    Content = new FormUrlEncodedContent(formValues),
-                    RequestUri = new Uri(_settings.AmadeusCRSClient.BaseUrl + _settings.AmadeusCRSClient.RequestAccessTokenPath)
-                };
+                Content = new FormUrlEncodedContent(formValues),
+                RequestUri = new Uri(_settings.AmadeusCRSClient.BaseUrl + _settings.AmadeusCRSClient.RequestAccessTokenPath)
+            };
 
-                var httpResponse = await _httpClient.SendAsync(request);
+            var httpResponse = await httpClient.SendAsync(request);
 
-                httpResponse.EnsureSuccessStatusCode();
+            httpResponse.EnsureSuccessStatusCode();
 
-                return await httpResponse.Content.ReadFromJsonAsync<AmadeusAuthResponse>();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-
-                // TODO: throw a custom exception here
-                throw;
-            }
+            return await httpResponse.Content.ReadFromJsonAsync<AmadeusAuthResponse>();
         }
     }
 }

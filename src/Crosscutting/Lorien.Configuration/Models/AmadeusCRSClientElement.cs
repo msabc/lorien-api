@@ -11,5 +11,7 @@
         public required string RequestAccessTokenPath { get; set; }
 
         public required string FlightOffersPath { get; set; }
+
+        public required int RequestTimeoutInSeconds { get; set; }
     }
 }

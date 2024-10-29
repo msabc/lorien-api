@@ -6,12 +6,13 @@
 
         public required string DestinationLocationCode { get; set; }
 
-        public DateTime DepartureDate { get; set; }
+        public required DateTime DepartureDate { get; set; }
 
-        public DateTime DestinationDate { get; set; }
+        public required byte Adults { get; set; }
 
-        public byte NumberOfPassengers { get; set; }
-
-        public required string CurrencyCode { get; set; }
+        public override string ToString()
+        {
+            return $"{OriginLocationCode}-{DestinationLocationCode}-{DepartureDate:yyyy-MM-dd}-{Adults}";
+        }
     }
 }

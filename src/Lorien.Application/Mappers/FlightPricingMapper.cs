@@ -15,7 +15,7 @@ namespace Lorien.Application.Mappers
                 DepartureDate = request.DepartureDate,
                 DestinationLocationCode = request.DestinationLocationCode,
                 OriginLocationCode = request.OriginLocationCode,
-                Adults = request.NumberOfPassengers
+                Adults = request.Adults
             };
         }
 

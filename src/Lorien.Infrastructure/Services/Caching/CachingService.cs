@@ -21,15 +21,15 @@ namespace Lorien.Infrastructure.Services.Caching
             memoryCache.Set(key, items,
                 keepIndefinitely ?
                 new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromSeconds(int.MaxValue)) :
-                new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(options.Value.RequestCachingTimeToLiveInMinutes)));
+                new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(options.Value.FlightPricingRequestCachingTimeToLiveInMinutes)));
         }
 
-        public IEnumerable<T>? Get<T>(string key)
+        public T? Get<T>(string key)
         {
-            if (memoryCache.TryGetValue(key, out IEnumerable<T>? value))
+            if (memoryCache.TryGetValue(key, out T? value))
                 return value;
 
-            return null;
+            return default;
         }
 
         public void AddInitialMemoryCacheData()
@@ -45,7 +45,6 @@ namespace Lorien.Infrastructure.Services.Caching
             {
                 logger.LogError($"Error saving data to memory cache. {ex.Message}");
             }
-
         }
 
         public IEnumerable<(string, int)> GetCacheInfo()

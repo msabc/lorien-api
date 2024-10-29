@@ -21,9 +21,9 @@ namespace Lorien.Api.Controllers
         }
 
         [HttpGet("iata-codes")]
-        public async Task<IActionResult> GetIATACodes()
+        public async Task<IActionResult> GetIATACodes([FromQuery] GetIATACodesRequest request)
         {
-            return Ok(await _flightService.GetIATACodes());
+            return Ok(await _flightService.GetIATACodes(request));
         }
     }
 }

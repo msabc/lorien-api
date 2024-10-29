@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Crosscutting\Lorien.Configuration\Lorien.Configuration.csproj" />
     <ProjectReference Include="..\Lorien.Domain\Lorien.Domain.csproj" />
   </ItemGroup>
 

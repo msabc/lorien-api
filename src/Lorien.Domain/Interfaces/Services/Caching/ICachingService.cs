@@ -4,7 +4,7 @@
     {
         void Add<T>(string key, IEnumerable<T> items, bool keepIndefinitely = false);
 
-        IEnumerable<T>? Get<T>(string key);
+        T? Get<T>(string key);
 
         void AddInitialMemoryCacheData();
 
