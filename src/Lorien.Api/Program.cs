@@ -1,4 +1,5 @@
 using Lorien.Api.Filters;
+using Lorien.Api.Jobs;
 using Lorien.IoC;
 
 const string ClientApplicationPermissionPolicyName = nameof(ClientApplicationPermissionPolicyName);
@@ -25,6 +26,10 @@ builder.Services.AddCors(options =>
 builder.Services.RegisterApplicationDependencies(builder.Configuration);
 
 builder.Services.AddScoped<ApiExceptionFilterAttribute>();
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddHostedService<CachingJob>();
 
 var app = builder.Build();
 

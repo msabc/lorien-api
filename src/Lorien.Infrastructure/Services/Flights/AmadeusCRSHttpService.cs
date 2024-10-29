@@ -5,7 +5,6 @@ using Lorien.Domain.Models.Response.Auth;
 using Lorien.Domain.Models.Response.Flights;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;

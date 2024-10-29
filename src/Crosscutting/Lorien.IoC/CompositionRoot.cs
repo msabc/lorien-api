@@ -1,8 +1,11 @@
-﻿using Lorien.Application.Services;
+﻿using Lorien.Application.Services.Flights;
+using Lorien.Application.Services.Internal;
 using Lorien.Configuration;
 using Lorien.Domain.Interfaces.Repositories;
+using Lorien.Domain.Interfaces.Services.Caching;
 using Lorien.Domain.Interfaces.Services.Flights;
 using Lorien.Infrastructure.Repositories;
+using Lorien.Infrastructure.Services.Caching;
 using Lorien.Infrastructure.Services.Flights;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +18,7 @@ namespace Lorien.IoC
         public static IServiceCollection RegisterApplicationDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             services.RegisterSettings(configuration)
-                    .RegisterHttpClients(configuration)
+                    .RegisterInfrastructureServices(configuration)
                     .RegisterRepositories()
                     .RegisterApplicationServices();
 
@@ -29,7 +32,7 @@ namespace Lorien.IoC
             return services;
         }
 
-        private static IServiceCollection RegisterHttpClients(this IServiceCollection services, IConfiguration configuration)
+        private static IServiceCollection RegisterInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             ServiceProvider serviceProvider = services.BuildServiceProvider();
 
@@ -47,6 +50,8 @@ namespace Lorien.IoC
                 client.BaseAddress = new Uri(settings.AmadeusCRSClient.BaseUrl);
             });
 
+            services.AddScoped<ICachingService, CachingService>();
+
             return services;
         }
 
@@ -61,6 +66,7 @@ namespace Lorien.IoC
         private static IServiceCollection RegisterApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IFlightPricingService, FlightPricingService>();
+            services.AddScoped<IInternalService, InternalService>();
 
             return services;
         }

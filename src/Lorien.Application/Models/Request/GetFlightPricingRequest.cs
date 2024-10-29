@@ -1,6 +1,6 @@
 ﻿namespace Lorien.Application.Models.Request
 {
-    public class GetFlightPricingRequest
+    public record GetFlightPricingRequest
     {
         public required string OriginLocationCode { get; set; }
 

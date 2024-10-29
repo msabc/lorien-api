@@ -1,12 +1,12 @@
-﻿using Lorien.Application.Models.Request;
-using Lorien.Application.Services;
+﻿using Lorien.Api.Controllers.Base;
+using Lorien.Application.Models.Request;
+using Lorien.Application.Services.Flights;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lorien.Api.Controllers
 {
-    [ApiController]
     [Route("flight-pricing")]
-    public class FlightPricingController(IFlightPricingService _flightService) : ControllerBase
+    public class FlightPricingController(IFlightPricingService _flightService) : LorienBaseController
     {
         [HttpGet]
         public async Task<IActionResult> GetFlightPrices([FromQuery] GetFlightPricingRequest request)

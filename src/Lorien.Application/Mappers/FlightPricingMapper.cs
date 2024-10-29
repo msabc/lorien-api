@@ -1,5 +1,6 @@
 ﻿using Lorien.Application.Models.Request;
 using Lorien.Application.Models.Response.Flights;
+using Lorien.Domain.Models.Data;
 using Lorien.Domain.Models.Request;
 using Lorien.Domain.Models.Response.Flights;
 
@@ -23,6 +24,22 @@ namespace Lorien.Application.Mappers
             return new GetFlightPricingResponse()
             {
                 FlightOffers = response.Data.Select(x => x.MapToDto())
+            };
+        }
+
+        public static GetCurrenciesResponse MapToResponse(this IEnumerable<Currency> currencies)
+        {
+            return new GetCurrenciesResponse()
+            {
+                Currencies = currencies
+            };
+        }
+
+        public static GetIATACodesResponse MapToResponse(this IEnumerable<IATACode> iataCodes)
+        {
+            return new GetIATACodesResponse()
+            {
+                IATACodes = iataCodes
             };
         }
 
