@@ -9,5 +9,8 @@ namespace Lorien.Domain.Models.Data
 
         [JsonPropertyName("alphabeticcode")]
         public required string Code { get; set; }
+
+        [JsonPropertyName("withdrawaldate")]
+        public string? WithdrawalDate { get; set; }
     }
 }

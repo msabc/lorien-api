@@ -9,7 +9,8 @@ namespace Lorien.Infrastructure.Repositories
     {
         public IEnumerable<Currency> Get()
         {
-            return JsonSerializer.Deserialize<IEnumerable<Currency>>(Resources.currency_codes);
+            var currencies = JsonSerializer.Deserialize<IEnumerable<Currency>>(Resources.currency_codes);
+            return currencies!.Where(x => x.Code is not null && x.WithdrawalDate is null).DistinctBy(x => x.Code);
         }
     }
 }
