@@ -1,11 +1,12 @@
 ﻿using Lorien.Application.Models.Request;
 using Lorien.Application.Services.Flights;
-using Lorien.Domain.Interfaces.Repositories;
+using Lorien.Configuration;
 using Lorien.Domain.Interfaces.Services.Caching;
 using Lorien.Domain.Interfaces.Services.Flights;
 using Lorien.Domain.Models.Request;
 using Lorien.Domain.Models.Response.Flights;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Lorien.Tests.Unit.Application.Services
@@ -15,7 +16,7 @@ namespace Lorien.Tests.Unit.Application.Services
         private readonly Mock<IAmadeusCRSHttpService> _amadeusCRSHttpServiceMock;
         private readonly Mock<ICachingService> _cachingServiceMock;
         private readonly Mock<ILogger<FlightPricingService>> _loggerMock;
-        private readonly Mock<ILogger<FlightPricingService>> _settingsMock;
+        private readonly Mock<IOptions<LorienSettings>> _settingsMock;
 
         private readonly IFlightPricingService _flightPricingService;
 
@@ -24,11 +25,13 @@ namespace Lorien.Tests.Unit.Application.Services
             _amadeusCRSHttpServiceMock = new Mock<IAmadeusCRSHttpService>();
             _cachingServiceMock = new Mock<ICachingService>();
             _loggerMock = new Mock<ILogger<FlightPricingService>>();
+            _settingsMock = new Mock<IOptions<LorienSettings>>();
 
             _flightPricingService = new FlightPricingService(
                 _amadeusCRSHttpServiceMock.Object,
                 _cachingServiceMock.Object,
-                _loggerMock.Object
+                _loggerMock.Object,
+                _settingsMock.Object
             );
         }
 
@@ -50,7 +53,7 @@ namespace Lorien.Tests.Unit.Application.Services
             var request = GetTestRequest();
 
             _cachingServiceMock
-                .Setup(x => x.Get<FlightOfferData>(It.IsAny<string>()))
+                .Setup(x => x.Get<IEnumerable<FlightOfferData>>(It.IsAny<string>()))
                 .Returns(() => []);
 
             _flightPricingService.GetFlightPricingAsync(request);
@@ -64,7 +67,7 @@ namespace Lorien.Tests.Unit.Application.Services
             var request = GetTestRequest();
 
             _cachingServiceMock
-                .Setup(x => x.Get<FlightOfferData>(It.IsAny<string>()))
+                .Setup(x => x.Get<IEnumerable<FlightOfferData>>(It.IsAny<string>()))
                 .Returns(() => []);
 
             _flightPricingService.GetFlightPricingAsync(request);
@@ -80,7 +83,7 @@ namespace Lorien.Tests.Unit.Application.Services
             var request = GetTestRequest();
 
             _cachingServiceMock
-                .Setup(x => x.Get<FlightOfferData>(It.IsAny<string>()))
+                .Setup(x => x.Get<IEnumerable<FlightOfferData>>(It.IsAny<string>()))
                 .Returns(() => []);
 
             _flightPricingService.GetFlightPricingAsync(request);
@@ -97,7 +100,7 @@ namespace Lorien.Tests.Unit.Application.Services
             _flightPricingService.GetFlightPricingAsync(request);
 
             _cachingServiceMock
-                .Verify(x => x.Get<FlightOfferData>(request.ToString()), Times.Once);
+                .Verify(x => x.Get<IEnumerable<FlightOfferData>>(request.ToString()), Times.Once);
         }
 
         private static GetFlightPricingRequest GetTestRequest()
@@ -150,7 +153,7 @@ namespace Lorien.Tests.Unit.Application.Services
             };
 
             _cachingServiceMock
-                .Setup(x => x.Get<FlightOfferData>(It.IsAny<string>()))
+                .Setup(x => x.Get<IEnumerable<FlightOfferData>>(It.IsAny<string>()))
                 .Returns(() => testFlightOffers);
 
             _amadeusCRSHttpServiceMock

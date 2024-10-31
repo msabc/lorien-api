@@ -8,6 +8,8 @@
 
         public required DateTime DepartureDate { get; set; }
 
+        public DateTime? ReturnDate { get; set; }
+
         public required byte Adults { get; set; }
 
         public override string ToString()

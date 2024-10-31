@@ -10,7 +10,6 @@ using Lorien.Domain.Models.Data;
 using Lorien.Domain.Models.Response.Flights;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Linq;
 
 namespace Lorien.Application.Services.Flights
 {
